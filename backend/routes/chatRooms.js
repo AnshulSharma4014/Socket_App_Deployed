@@ -4,8 +4,11 @@ const chatModal = require("../models/chats");
 const fetchChatModal = require("../models/fetchChats");
 
 const router = express.Router();
+const baseUrl = process.env.BASE_URL;
+const baseUrlLocal = process.env.BASE_URL_LOCAL;
+
 const corsOptions = {
-	origin: ["http://localhost:3000", "http://192.168.33.146:3000"], // Replace with your React app's URL
+	origin: [baseUrl, baseUrlLocal], // Replace with your React app's URL
 };
 
 // Create a new chat

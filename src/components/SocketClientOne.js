@@ -7,6 +7,9 @@ import Register from "./Register";
 import HomePage from "./HomePage";
 
 class SocketCLientOne extends Component {
+	API_URL = process.env.BASE_URL_DATABASE_SERVER_LOCAL;
+	SOCKET_URL = process.env.BASE_URL_SOCKET_SERVER_LOCAL;
+
 	constructor(props) {
 		super(props);
 
@@ -17,7 +20,7 @@ class SocketCLientOne extends Component {
 			chats: [],
 		};
 
-		this.socket = io("http://localhost:5001/", {
+		this.socket = io(`${this.SOCKET_URL}/`, {
 			withCredentials: true,
 			extraHeaders: {
 				ConnectWithAnshul: "Sure",
@@ -33,7 +36,7 @@ class SocketCLientOne extends Component {
 			};
 
 			axios
-				.post("http://localhost:6001/chat/", requestObj)
+				.post(`${this.API_URL}/chat/`, requestObj)
 				.then((response) => {
 					console.log(response);
 					if (response && response.data && response.data.length > 0) {
@@ -136,7 +139,7 @@ class SocketCLientOne extends Component {
 		};
 
 		axios
-			.post("http://localhost:6001/chat/saveChats", messageData)
+			.post(`${this.API_URL}/chat/saveChats`, messageData)
 			.then((resp) => console.log(resp))
 			.catch((err) => console.error(err));
 	}

@@ -9,9 +9,11 @@ const cors = require("cors");
 
 //+ Mongo DB Variables & Socket Port
 const app = express();
-const PORT = 5001;
-const uri =
-	"mongodb+srv://anshulsharma4014:anshul.sharma@chatapplication.ji1li6c.mongodb.net/";
+const socketServerPort = process.env.SOCKET_SERVER_PORT;
+const databaseServerPort = process.env.MONGODB_SERVER_PORT;
+const uri = process.env.CHAT_URI;
+const baseUrl = process.env.BASE_URL;
+const baseUrlLocal = process.env.BASE_URL_LOCAL;
 
 //+ Required for Mongo DB Only
 const conrsOptions = {
@@ -37,14 +39,14 @@ app.use("/chat", chatRouter);
 const server = http.createServer(app);
 const io = new Server(server, {
 	cors: {
-		origin: ["http://192.168.33.146:3000", "http://localhost:3000"],
+		origin: [baseUrl, baseUrlLocal],
 		methods: ["GET", "POST"],
 		credentials: true,
 		allowedHeaders: ["ConnectWithAnshul"],
 	},
 });
-server.listen(PORT, () => {
-	console.log(`Socket Server is running on posrt: ${PORT}`);
+server.listen(socketServerPort, () => {
+	console.log(`Socket Server is running on posrt: ${socketServerPort}`);
 });
 
 io.on("connection", (socket) => {
@@ -86,8 +88,8 @@ io.engine.on("connection_error", (err) => {
 	console.log(err.context); // some additional error context
 });
 
-app.listen(6001, () => {
-	console.log(`Server is running on port 6001`);
+app.listen(databaseServerPort, () => {
+	console.log(`MongoDB Server is running on port ${databaseServerPort}`);
 });
 
 function generateRandomKey(length = 8) {
