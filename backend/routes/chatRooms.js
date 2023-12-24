@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
-const chatModal = require("../models/chats");
-const fetchChatModal = require("../models/fetchChats");
+const chatModal = require("../controller/models/chats");
+const recentChatModal = require("../controller/models/recentChats");
 
 const router = express.Router();
 const baseUrl = process.env.BASE_URL;
@@ -25,17 +25,19 @@ router.post("/saveChats", cors(corsOptions), async (req, res) => {
 // Retrieve all chats
 router.post("/", cors(corsOptions), async (req, res) => {
 	try {
-		const allChats = new fetchChatModal(req.body);
+		const senderId = req.body.senderId;
+		const receiverId = req.body.receiverId;
+
 		const chats = await chatModal
 			.find({
 				$or: [
 					{
-						senderId: allChats.senderId,
-						receiverId: allChats.receiverId,
+						senderId: senderId,
+						receiverId: receiverId,
 					},
 					{
-						senderId: allChats.receiverId,
-						receiverId: allChats.senderId,
+						senderId: receiverId,
+						receiverId: senderId,
 					},
 				],
 			})
@@ -49,6 +51,41 @@ router.post("/", cors(corsOptions), async (req, res) => {
 	}
 });
 
-// Add other endpoints as needed (update, delete, etc.)
+// Save Recent Chat Users
+router.post("/saveRecentlyTextedUsers", cors(corsOptions), async (req, res) => {
+	try {
+		const chat = new recentChatModal(req.body);
+		const existingChat = await recentChatModal.findOne({
+			senderId: req.body.senderId,
+			receiverId: req.body.receiverId,
+		});
+
+		if (!existingChat) {
+			await chat.save();
+			res.status(201).json(chat);
+		} else {
+			res.status(200);
+		}
+	} catch (error) {
+		res.status(400).json({ error: error.message });
+	}
+});
+
+router.post(
+	"/fetchRecentlyTextedUsers",
+	cors(corsOptions),
+	async (req, res) => {
+		try {
+			const recentChats = await recentChatModal
+				.find({ senderId: req.body.senderId })
+				.sort({ createdDate: "desc" }) // 'asc' for ascending, 'desc' for descending
+				.exec();
+
+			res.json(recentChats);
+		} catch (error) {
+			res.status(400).json({ error: error.message });
+		}
+	}
+);
 
 module.exports = router;

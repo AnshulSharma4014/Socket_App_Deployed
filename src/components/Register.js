@@ -21,13 +21,13 @@ const Register = ({ onLogin }) => {
 			<Form.Group controlId="chats" key="random">
 				<Form.Label>
 					<FaUser style={{ marginRight: "8px" }} />
-					Username
+					Name/Username
 				</Form.Label>
 				<br />
 				<br />
 				<Form.Control
 					type="text"
-					placeholder="Type your message here..."
+					placeholder="Type your name/username here"
 					name="message"
 					onChange={(event) => setUsername(event.target.value)}
 					style={{

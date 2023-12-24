@@ -1,38 +1,103 @@
 .App {
-  text-align: center;
+	text-align: center;
 }
 
 .App-logo {
-  height: 40vmin;
-  pointer-events: none;
+	height: 40vmin;
+	pointer-events: none;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+	.App-logo {
+		animation: App-logo-spin infinite 20s linear;
+	}
 }
 
 .App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+	background-color: #282c34;
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	font-size: calc(10px + 2vmin);
+	color: white;
 }
 
 .App-link {
-  color: #61dafb;
+	color: #61dafb;
 }
 
 @keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+.Recent-Chat-Style {
+	cursor: pointer;
+	padding: 10px;
+	background: linear-gradient(45deg, #ff5f6d, #ffc371);
+	border-radius: 10px;
+	max-width: 100px;
+	margin-top: 10px;
+	color: white;
+
+	&:hover {
+		background: linear-gradient(45deg, #ea8d8d, #a890fe);
+	}
+}
+
+/* styles.css */
+
+.New-Chat-Button {
+	position: absolute;
+	bottom: 20px;
+	right: 20px;
+	padding: 10px;
+	font-size: 16px;
+	background: linear-gradient(to right, #4e54c8, #8f94fb);
+	color: white;
+	border: none;
+	border-radius: 8px;
+	cursor: pointer;
+	transition: background-color 0.3s ease;
+}
+
+.New-Chat-Button:hover {
+	background: linear-gradient(to right, #8f94fb, #4e54c8);
+}
+
+.New-Chat-User-Select-Button {
+	background: linear-gradient(to right, #4e54c8, #8f94fb);
+	color: white;
+	padding: 10px;
+	font-size: 16px;
+	border: none;
+	border-radius: 8px;
+	cursor: pointer;
+	transition: background-color 0.3s ease;
+}
+
+.New-Chat-User-Select-Button:hover {
+	background: linear-gradient(to right, #8f94fb, #4e54c8);
+}
+
+/* styles.css */
+
+.New-Chat-Input {
+	padding: 10px;
+	font-size: 16px;
+	border: 1px solid #ccc;
+	border-radius: 8px;
+	outline: none;
+	transition: border-color 0.3s ease;
+	width: 80%; /* Set width as needed */
+}
+
+.New-Chat-Input:focus {
+	border-color: #4e54c8;
 }

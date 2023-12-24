@@ -7,9 +7,6 @@ import Register from "./Register";
 import HomePage from "./HomePage";
 
 class SocketCLientOne extends Component {
-	API_URL = process.env.BASE_URL_DATABASE_SERVER_LOCAL;
-	SOCKET_URL = process.env.BASE_URL_SOCKET_SERVER_LOCAL;
-
 	constructor(props) {
 		super(props);
 
@@ -20,44 +17,33 @@ class SocketCLientOne extends Component {
 			chats: [],
 		};
 
-		this.socket = io(`${this.SOCKET_URL}/`, {
-			withCredentials: true,
-			extraHeaders: {
-				ConnectWithAnshul: "Sure",
-			},
-		});
+		this.socket = io(`http://localhost:5001/`);
 
 		this.socket.on("already_joined", (msg) => {});
 
 		this.socket.on("joined", (msg) => {
 			const requestObj = {
-				senderId: this.state.senderEmail,
-				receiverId: this.state.receiverEmail,
+				senderId: this.state.senderEmail?.toLowerCase(),
+				receiverId: this.state.receiverEmail?.toLowerCase(),
 			};
 
 			axios
-				.post(`${this.API_URL}/chat/`, requestObj)
+				.post(`http://localhost:6001/chat/`, requestObj)
 				.then((response) => {
-					console.log(response);
 					if (response && response.data && response.data.length > 0) {
-						console.log("Setting data, ", response.data);
-
 						const transformedArray = response.data.map((item) => ({
 							id: item._id,
 							msg: item.message,
-							sender: item.senderId,
-							receiver: item.receiverId,
+							sender: item.senderId?.toLowerCase(),
+							receiver: item.receiverId?.toLowerCase(),
 							createdDate: new Date(item.createdAt),
 							updatedDate: new Date(item.updatedAt),
 						}));
 
 						this.setState({ chats: transformedArray });
 					}
-					console.log(this.state.chats);
 				})
 				.catch((error) => console.error(error));
-
-			console.log(this.state.chats);
 		});
 
 		this.socket.on("new_msg", (message) => {
@@ -86,7 +72,7 @@ class SocketCLientOne extends Component {
 		const myCookieValue = Cookies.get("anshul-chat-user");
 
 		if (myCookieValue) {
-			this.setState({ senderEmail: myCookieValue });
+			this.setState({ senderEmail: myCookieValue?.toLowerCase() });
 		} else {
 			this.setState({ senderEmail: "" });
 		}
@@ -98,14 +84,14 @@ class SocketCLientOne extends Component {
 
 	sendJoinRequest() {
 		this.socket.emit("join", {
-			email: this.state.senderEmail,
+			email: this.state.senderEmail?.toLowerCase(),
 			connectId: this.socket.id,
 		});
 	}
 
 	sendSocketJoinRequest() {
 		this.socket.emit("join", {
-			email: this.state.senderEmail,
+			email: this.state.senderEmail?.toLowerCase(),
 			connectId: this.socket.id,
 		});
 	}
@@ -113,14 +99,14 @@ class SocketCLientOne extends Component {
 	sendMessageToTheSocket(chatMessage) {
 		this.socket.emit("new_msg", {
 			message: chatMessage,
-			receiverId: this.state.receiverEmail,
-			senderId: this.state.senderEmail,
+			receiverId: this.state.receiverEmail?.toLowerCase(),
+			senderId: this.state.senderEmail?.toLowerCase(),
 		});
 
 		const message = {
 			msg: chatMessage,
-			receiver: this.state.receiverEmail,
-			sender: this.state.senderEmail,
+			receiver: this.state.receiverEmail?.toLowerCase(),
+			sender: this.state.senderEmail?.toLowerCase(),
 			id: this.generateSecureRandomKey(16),
 			createdDate: new Date(),
 			updatedDate: new Date(),
@@ -133,13 +119,21 @@ class SocketCLientOne extends Component {
 		this.clearInputField();
 
 		const messageData = {
-			receiverId: this.state.receiverEmail,
-			senderId: this.state.senderEmail,
+			receiverId: this.state.receiverEmail?.toLowerCase(),
+			senderId: this.state.senderEmail?.toLowerCase(),
 			message: chatMessage,
 		};
 
 		axios
-			.post(`${this.API_URL}/chat/saveChats`, messageData)
+			.post(`http://localhost:6001/chat/saveChats`, messageData)
+			.then((resp) => console.log(resp))
+			.catch((err) => console.error(err));
+
+		axios
+			.post(
+				"http://localhost:6001/chat/saveRecentlyTextedUsers",
+				messageData
+			)
 			.then((resp) => console.log(resp))
 			.catch((err) => console.error(err));
 	}
@@ -155,7 +149,7 @@ class SocketCLientOne extends Component {
 	}
 
 	handleLoginSuccess(senderUsername) {
-		this.setState({ senderEmail: senderUsername }, () => {
+		this.setState({ senderEmail: senderUsername?.toLowerCase() }, () => {
 			this.sendJoinRequest();
 		});
 	}
@@ -171,20 +165,23 @@ class SocketCLientOne extends Component {
 					className="d-flex flex-column justify-content-center align-items-center"
 					style={{
 						margin: "1%",
-						backgroundColor: "#f0f0f0",
+						background: "linear-gradient(45deg, #A9F1DF, #FFBBBB)",
 						paddingLeft: "20px",
 						paddingRight: "20px",
 						boxShadow: "rgba(0, 0, 0, 0.2) 0px 0px 10px",
-						height: "98vh",
+						height: "96vh",
 						overflowY: "auto",
 						position: "relative",
+						borderRadius: "10px",
 					}}
 				>
 					{this.state.senderEmail ? (
 						<HomePage
 							onSendMessage={this.sendMessageToTheSocket}
 							onSetReceiverId={(data) =>
-								this.setState({ receiverEmail: data })
+								this.setState({
+									receiverEmail: data?.toLowerCase(),
+								})
 							}
 							onfetchChatData={this.sendSocketJoinRequest}
 							onClearChats={this.clearChats}

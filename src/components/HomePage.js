@@ -5,20 +5,34 @@ import { Button, Form } from "react-bootstrap";
 import { FaPaperPlane, FaArrowLeft } from "react-icons/fa";
 import ChatBubble from "./ChatBubble";
 import NewChat from "./NewChat";
+import { toSentenceCase } from "./Utility";
+import axios from "axios";
+import "../App.css";
 
 const HomePage = (props) => {
 	const [chatWithUser, setChatWithUser] = useState(false);
 	const [chatMessage, setChatMessage] = useState("");
 	const [showNewChatModal, setShowNewChatModal] = useState(false);
+	const [placeHolderMessage, setPlaceHolderMessage] = useState("Message");
+	const [recentlyChattedUsers, setRecentlyChattedUsers] = useState([]);
 
-	const recentlyChattedUsers = [
-		{ receiveId: "Tejaswini", name: "User 1" },
-		{ receiveId: "Sushma", name: "User 2" },
-		{ receiveId: "Giri", name: "User 3" },
-		{ receiveId: "Govardhan", name: "User 4" },
-		{ receiveId: "Anshul", name: "User 5" },
-		// Add more user data as needed
-	];
+	useEffect(() => {
+		const requestObj = {
+			senderId: props.senderId?.toLowerCase(),
+		};
+
+		setPlaceHolderMessage("Message " + toSentenceCase(props.receiverId));
+		axios
+			.post(
+				`http://localhost:6001/chat/fetchRecentlyTextedUsers`,
+				requestObj
+			)
+			.then((resp) => {
+				console.log(resp);
+				setRecentlyChattedUsers(resp.data);
+			})
+			.catch((err) => console.error(err));
+	}, [props]);
 
 	const chatContainerRef = useRef(null);
 
@@ -32,12 +46,6 @@ const HomePage = (props) => {
 			chatContainerRef.current.scrollTop =
 				chatContainerRef.current.scrollHeight;
 		}
-	};
-
-	const handleFormSubmit = (evt) => {
-		evt.preventDeault();
-		sendMessage();
-		scrollToBottom();
 	};
 
 	const sendMessage = () => {
@@ -74,29 +82,39 @@ const HomePage = (props) => {
 		setChatMessage("");
 	};
 
+	const handleKeyPress = (event) => {
+		if (event.key === "Enter") {
+			event.preventDefault();
+			if (event.target.value) {
+				setChatMessage(event.target.value);
+				sendMessage();
+				scrollToBottom();
+			}
+		}
+	};
+
 	return (
 		<div>
 			{chatWithUser ? (
 				<>
-					<Form onSubmit={handleFormSubmit}>
+					<Form>
 						<Form.Group controlId="chats" key="random">
 							<div
 								ref={chatContainerRef}
 								style={{
 									overflowY: "auto",
-									maxHeight: "95vh", // Adjust the max height as needed
+									maxHeight: "95vh",
 									position: "relative",
 								}}
 							>
 								<span
 									style={{
-										position: "sticky", // Make the span sticky
+										position: "sticky",
 										top: 0,
-										backgroundColor: "#f0f0f0", // Match the container background color
-										padding: "10px", // Add padding as needed
+										padding: "10px",
 										display: "flex",
 										alignItems: "center",
-										zIndex: 1, // Ensure the span stays above the scrolling content
+										zIndex: 1,
 									}}
 								>
 									<FaArrowLeft
@@ -106,28 +124,25 @@ const HomePage = (props) => {
 											marginRight: "25px",
 										}}
 									/>
-									Hi {props.senderId}, you are currently
-									chatting with {props.receiverId}!
+									Hi {toSentenceCase(props.senderId)}, you are
+									currently chatting with{" "}
+									{toSentenceCase(props.receiverId)}
 								</span>
 								<br />
 								<br />
 								{props.chats && props.chats.length > 0
-									? props.chats.map((item) => {
-											return (
-												<div key={item.id}>
-													<ChatBubble
-														message={item.msg}
-														sender={item.sender}
-														createdDate={
-															item.createdDate
-														}
-														senderEmail={
-															props.senderId
-														}
-													/>
-												</div>
-											);
-									  })
+									? props.chats.map((item) => (
+											<div key={item.id}>
+												<ChatBubble
+													message={item.msg}
+													sender={item.sender}
+													createdDate={
+														item.createdDate
+													}
+													senderEmail={props.senderId}
+												/>
+											</div>
+									  ))
 									: ""}
 								<br />
 								<br />
@@ -136,7 +151,6 @@ const HomePage = (props) => {
 									style={{
 										position: "sticky",
 										bottom: 0,
-										backgroundColor: "#f0f0f0",
 										padding: "10px",
 										display: "flex",
 										alignItems: "center",
@@ -144,28 +158,38 @@ const HomePage = (props) => {
 										width: "90%",
 									}}
 								>
-									<Form.Label>
-										Message {props.receiverId}&nbsp;&nbsp;
-									</Form.Label>
+									<Form.Label>&nbsp;&nbsp;</Form.Label>
 									<Form.Control
 										type="text"
-										placeholder="Type your message here..."
+										placeholder={placeHolderMessage}
 										name="message"
-										onChange={(evt) =>
-											setChatMessage(evt.target.value)
-										}
+										onChange={(evt) => {
+											if (evt.target.value) {
+												setChatMessage(
+													evt.target.value
+												);
+											}
+										}}
+										onKeyDown={handleKeyPress}
 										style={{
 											borderRadius: "20px",
 											border: "2px solid #ccc",
 											padding: "10px",
 											outline: "none",
-											width: "70%",
+											width: "95vw",
 										}}
 										value={chatMessage || ""}
 									/>
 									<Button
 										variant="primary"
 										style={{
+											position: "absolute",
+											top: "10px",
+											right: "10px",
+											cursor: "pointer",
+											border: "none",
+											background: "transparent",
+											fontSize: "16px",
 											borderRadius: "20px",
 											padding: "10px 20px",
 											display: "inline-block",
@@ -190,31 +214,24 @@ const HomePage = (props) => {
 							minHeight: "200px",
 						}}
 					>
-						<h2>Recently Chatted Users</h2>
-						<ul>
+						<h2>Recent Chats</h2>
+						<div>
 							{recentlyChattedUsers.map((user) => (
-								<li
-									key={user.receiveId}
-									data-name={user.receiveId}
+								<div
+									key={user._id}
+									data-name={user.receiverId}
 									onClick={handleChatClick}
-									style={{
-										cursor: "pointer",
-									}}
+									className="Recent-Chat-Style"
 								>
-									{user.receiveId}
-								</li>
+									{toSentenceCase(user.receiverId)}
+									<br />
+								</div>
 							))}
-						</ul>
+						</div>
 
 						{/* New Chat Button */}
 						<button
-							style={{
-								position: "absolute",
-								bottom: "20px",
-								right: "20px",
-								padding: "10px",
-								fontSize: "16px",
-							}}
+							className="New-Chat-Button"
 							onClick={handleNewChatButtonClick}
 						>
 							New Chat
