@@ -15,6 +15,11 @@ const HomePage = (props) => {
 	const [showNewChatModal, setShowNewChatModal] = useState(false);
 	const [placeHolderMessage, setPlaceHolderMessage] = useState("Message");
 	const [recentlyChattedUsers, setRecentlyChattedUsers] = useState([]);
+	const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+
+	const handleEmojiSelect = (emoji) => {
+		setChatMessage((prevMessage) => prevMessage + emoji);
+	};
 
 	useEffect(() => {
 		const requestObj = {
@@ -49,8 +54,10 @@ const HomePage = (props) => {
 	};
 
 	const sendMessage = () => {
-		props.onSendMessage(chatMessage);
-		clearInput();
+		if (chatMessage) {
+			props.onSendMessage(chatMessage);
+			clearInput();
+		}
 	};
 
 	const handleChatClick = (event) => {
@@ -115,6 +122,7 @@ const HomePage = (props) => {
 										display: "flex",
 										alignItems: "center",
 										zIndex: 1,
+										backdropFilter: "blur(10px)",
 									}}
 								>
 									<FaArrowLeft
@@ -155,7 +163,7 @@ const HomePage = (props) => {
 										display: "flex",
 										alignItems: "center",
 										zIndex: 1,
-										width: "90%",
+										backdropFilter: "blur(10px)",
 									}}
 								>
 									<Form.Label>&nbsp;&nbsp;</Form.Label>
@@ -180,6 +188,7 @@ const HomePage = (props) => {
 										}}
 										value={chatMessage || ""}
 									/>
+
 									<Button
 										variant="primary"
 										style={{

@@ -6,6 +6,8 @@ const ChatBubble = ({ message, sender, createdDate, senderEmail }) => {
 				display: "flex",
 				flexDirection: "column", // Stack elements vertically
 				alignItems: isMyMessage ? "flex-end" : "flex-start",
+				paddingLeft: "20px",
+				paddingRight: "20px",
 			}}
 		>
 			<div
@@ -21,8 +23,18 @@ const ChatBubble = ({ message, sender, createdDate, senderEmail }) => {
 				}}
 			>
 				{message}
+				<br />
+				<span
+					style={{
+						fontSize: "12px",
+						color: "#888", // Add your desired color
+						marginTop: "5px", // Add space between message and time
+					}}
+				>
+					{formatTime(createdDate)}{" "}
+				</span>
 			</div>
-			<div
+			{/*<div
 				style={{
 					fontSize: "12px",
 					color: "#888", // Add your desired color
@@ -30,8 +42,7 @@ const ChatBubble = ({ message, sender, createdDate, senderEmail }) => {
 				}}
 			>
 				{formatTime(createdDate)}{" "}
-				{/* Replace 'formatTime' with your time formatting function */}
-			</div>
+			</div>*/}
 		</div>
 	);
 };

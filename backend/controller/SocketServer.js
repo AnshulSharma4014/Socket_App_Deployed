@@ -44,7 +44,8 @@ app.use("/chat", chatRouter);
 const server = http.createServer(app);
 const io = require("socket.io")(server, {
 	cors: {
-		origin: [baseUrl, baseUrlLocal],
+		origin: "*",
+		methods: ["GET", "POST"],
 	},
 });
 server.listen(socketServerPort, () => {

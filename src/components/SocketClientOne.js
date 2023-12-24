@@ -166,8 +166,6 @@ class SocketCLientOne extends Component {
 					style={{
 						margin: "1%",
 						background: "linear-gradient(45deg, #A9F1DF, #FFBBBB)",
-						paddingLeft: "20px",
-						paddingRight: "20px",
 						boxShadow: "rgba(0, 0, 0, 0.2) 0px 0px 10px",
 						height: "96vh",
 						overflowY: "auto",
